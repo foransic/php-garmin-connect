@@ -181,7 +181,7 @@ class GarminConnect
     }
 
     /**
-     * @return mixed
+     * @return string
      * @throws UnexpectedResponseCodeException
      */
     public function getActivityTypes()
@@ -194,8 +194,7 @@ class GarminConnect
         if ($this->objConnector->getLastResponseCode() != 200) {
             throw new UnexpectedResponseCodeException($this->objConnector->getLastResponseCode());
         }
-        $objResponse = json_decode($strResponse);
-        return $objResponse;
+        return $strResponse;
     }
 
     /**
@@ -204,7 +203,7 @@ class GarminConnect
      * @param integer $intStart
      * @param integer $intLimit
      * @param null $strActivityType
-     * @return mixed
+     * @return string
      * @throws UnexpectedResponseCodeException
      */
     public function getActivityList($intStart = 0, $intLimit = 10, $strActivityType = null)
@@ -227,15 +226,14 @@ class GarminConnect
         if ($this->objConnector->getLastResponseCode() != 200) {
             throw new UnexpectedResponseCodeException($this->objConnector->getLastResponseCode());
         }
-        $objResponse = json_decode($strResponse);
-        return $objResponse;
+        return $strResponse;
     }
 
     /**
      * Gets the summary information for the activity
      *
      * @param integer $intActivityID
-     * @return mixed
+     * @return string
      * @throws GarminConnect\exceptions\UnexpectedResponseCodeException
      */
     public function getActivitySummary($intActivityID)
@@ -244,15 +242,14 @@ class GarminConnect
         if ($this->objConnector->getLastResponseCode() != 200) {
             throw new UnexpectedResponseCodeException($this->objConnector->getLastResponseCode());
         }
-        $objResponse = json_decode($strResponse);
-        return $objResponse;
+        return $strResponse;
     }
 
     /**
      * Gets the detailed information for the activity
      *
      * @param integer $intActivityID
-     * @return mixed
+     * @return string
      * @throws GarminConnect\exceptions\UnexpectedResponseCodeException
      */
     public function getActivityDetails($intActivityID)
@@ -261,20 +258,19 @@ class GarminConnect
         if ($this->objConnector->getLastResponseCode() != 200) {
             throw new UnexpectedResponseCodeException($this->objConnector->getLastResponseCode());
         }
-        $objResponse = json_decode($strResponse);
-        return $objResponse;
+        return $strResponse;
     }
 
     /**
      * Gets the extended details for the activity
      *
      * @param $intActivityID
-     * @return mixed
+     * @return string
      */
     public function getExtendedActivityDetails($intActivityID)
     {
         $strResponse = $this->objConnector->get("https://connect.garmin.com/modern/proxy/activity-service/activity/" . $intActivityID . "/details?maxChartSize=1000&maxPolylineSize=1000");
-        return json_decode($strResponse);
+        return $strResponse;
     }
 
     /**
@@ -284,7 +280,7 @@ class GarminConnect
      * @param $intActivityID
      * @throws GarminConnect\exceptions\UnexpectedResponseCodeException
      * @throws Exception
-     * @return mixed
+     * @return string
      */
     public function getDataFile($strType, $intActivityID)
     {
@@ -308,7 +304,7 @@ class GarminConnect
     }
 
     /**
-     * @return mixed
+     * @return string
      * @throws UnexpectedResponseCodeException
      */
     public function getUser()
@@ -317,12 +313,11 @@ class GarminConnect
         if ($this->objConnector->getLastResponseCode() != 200) {
             throw new UnexpectedResponseCodeException($this->objConnector->getLastResponseCode());
         }
-        $objResponse = json_decode($strResponse);
-        return $objResponse;
+        return $strResponse;
     }
 
     /**
-     * @return mixed
+     * @return string
      * @throws UnexpectedResponseCodeException
      */
     public function getUsername()
@@ -341,7 +336,7 @@ class GarminConnect
      * @param string $strUntil
      * @throws GarminConnect\exceptions\UnexpectedResponseCodeException
      * @throws Exception
-     * @return mixed
+     * @return string
      */
     public function getWeightData($strFrom = '2019-01-01', $strUntil = '2099-12-31')
     {
@@ -362,8 +357,7 @@ class GarminConnect
         if ($this->objConnector->getLastResponseCode() != 200) {
             throw new UnexpectedResponseCodeException($this->objConnector->getLastResponseCode());
         }
-        $objResponse = json_decode($strResponse, true);
-        return $objResponse;
+        return $strResponse;
     }
 
     /**
@@ -394,8 +388,65 @@ class GarminConnect
         if ($this->objConnector->getLastResponseCode() != 200) {
             throw new UnexpectedResponseCodeException($this->objConnector->getLastResponseCode());
         }
-        $objResponse = json_decode($strResponse, true);
-        return $objResponse;
+        return $strResponse;
     }
 
+    /**
+     * Gets a list of favorite segments
+     *
+     * @param integer $intStart
+     * @param integer $intLimit
+     * @param null $strActivityType
+     * @return string
+     * @throws UnexpectedResponseCodeException
+     */
+    public function getFavoriteSegments($intStart = 0, $intLimit = 10, $strActivityType = null)
+    {
+        $arrParams = array(
+            'start' => $intStart,
+            'limit' => $intLimit
+        );
+
+        if (!isset($strActivityType)) {
+            $strActivityType = 'all';
+        }
+
+        $strResponse = $this->objConnector->get(
+            'https://connect.garmin.com/modern/proxy/segment-service/segment/filter/summarylist/favorite/' . $strActivityType,
+            $arrParams,
+            true
+        );
+
+        if ($this->objConnector->getLastResponseCode() != 200) {
+            throw new UnexpectedResponseCodeException($this->objConnector->getLastResponseCode());
+        }
+        return $strResponse;
+    }
+
+    /**
+     * Gets the personal leaderboard for a segment
+     *
+     * @param string $segmentUuid
+     * @return string
+     * @throws UnexpectedResponseCodeException
+     */
+    public function getSegmentLeaderboard($segmentUuid = null)
+    {
+        $arrParams = array(
+            'segmentUuid' => $segmentUuid,
+            'meOnly' => 'true'
+        );
+
+        $strResponse = $this->objConnector->post(
+            'https://connect.garmin.com/modern/proxy/segment-service/leaderboard/search/',
+            $arrParams,
+            null,
+            true
+        );
+
+        if ($this->objConnector->getLastResponseCode() != 200) {
+            throw new UnexpectedResponseCodeException($this->objConnector->getLastResponseCode());
+        }
+        return $strResponse;
+    }
 }
