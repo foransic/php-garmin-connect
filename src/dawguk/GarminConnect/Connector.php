@@ -106,7 +106,7 @@ class Connector
      * @param string|null $strReferer
      * @return mixed
      */
-    public function post($strUrl, $arrParams = array(), $arrData = array(), $bolAllowRedirects = true, $strReferer = null)
+    public function post($strUrl, $arrParams = array(), $arrData = array(), $bolAllowRedirects = true, $strReferer = null, $json = false)
     {
 
         curl_setopt($this->objCurl, CURLOPT_HEADER, true);
@@ -115,8 +115,14 @@ class Connector
         curl_setopt($this->objCurl, CURLOPT_CUSTOMREQUEST, "POST");
         curl_setopt($this->objCurl, CURLOPT_VERBOSE, false);
         if ($arrData !== null && count($arrData)) {
-            curl_setopt($this->objCurl, CURLOPT_HTTPHEADER, array('Content-Type: application/x-www-form-urlencoded'));
-            curl_setopt($this->objCurl, CURLOPT_POSTFIELDS, http_build_query($arrData));
+            if ($json) {
+                curl_setopt($this->objCurl, CURLOPT_HTTPHEADER, array('Content-Type: application/json;charset=UTF-8', 'NK: NT', 'Content-Length: ' . strlen(json_encode($arrData))));
+                curl_setopt($this->objCurl, CURLOPT_POSTFIELDS, json_encode($arrData));
+            } else {
+                curl_setopt($this->objCurl, CURLOPT_HTTPHEADER, array('Content-Type: application/x-www-form-urlencoded'));
+                curl_setopt($this->objCurl, CURLOPT_POSTFIELDS, http_build_query($arrData));
+            }
+            
         }
         if (null !== $strReferer) {
             curl_setopt($this->objCurl, CURLOPT_REFERER, $strReferer);
@@ -128,6 +134,7 @@ class Connector
         $strResponse = curl_exec($this->objCurl);
         $this->arrCurlInfo = curl_getinfo($this->objCurl);
         $this->intLastResponseCode = (int)$this->arrCurlInfo['http_code'];
+        print_r($strResponse);
         return $strResponse;
     }
 

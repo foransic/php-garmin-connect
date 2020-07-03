@@ -427,19 +427,23 @@ class GarminConnect
      * Gets the personal leaderboard for a segment
      *
      * @param string $segmentUuid
+     * @param string $startingRowNumber
      * @return string
      * @throws UnexpectedResponseCodeException
      */
-    public function getSegmentLeaderboard($segmentUuid = null)
+    public function getSegmentLeaderboard($segmentUuid = null, $startingRowNumber = 0)
     {
-        $arrParams = array(
+        $arrData = array(
             'segmentUuid' => $segmentUuid,
-            'meOnly' => 'true'
+            'meOnly' => 'true',
+            'startingRowNumber' => $startingRowNumber
         );
 
         $strResponse = $this->objConnector->post(
             'https://connect.garmin.com/modern/proxy/segment-service/leaderboard/search/',
-            $arrParams,
+            null,
+            $arrData,
+            true,
             null,
             true
         );
