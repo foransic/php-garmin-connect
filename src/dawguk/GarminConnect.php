@@ -326,7 +326,7 @@ class GarminConnect
         if (!$objUser) {
             return null;
         }
-        return $objUser->username;
+        return json_decode($objUser)->{'username'};
     }
 
     /**
