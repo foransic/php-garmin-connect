@@ -424,6 +424,42 @@ class GarminConnect
     }
 
     /**
+     * Gets the segment detail
+     *
+     * @param string $segmentUuid
+     * @return string
+     * @throws UnexpectedResponseCodeException
+     */
+    public function getSegment($segmentUuid = null)
+    {
+        $strResponse = $this->objConnector->get('https://connect.garmin.com/modern/proxy/course-service/segment/' . $segmentUuid);
+
+        if ($this->objConnector->getLastResponseCode() != 200) {
+            throw new UnexpectedResponseCodeException($this->objConnector->getLastResponseCode());
+        }
+        return $strResponse;
+    }
+
+    /**
+     * Gets the podium for a segment
+     *
+     * @param string $segmentUuid
+     * @return string
+     * @throws UnexpectedResponseCodeException
+     */
+    public function getSegmentPodium($segmentUuid = null)
+    {
+        $displayName = json_decode($this->getUser())->{'displayName'};
+
+        $strResponse = $this->objConnector->get('https://connect.garmin.com/modern/proxy/segment-service/leaderboard/segment/' . $segmentUuid . '/rank/' . $displayName);
+
+        if ($this->objConnector->getLastResponseCode() != 200) {
+            throw new UnexpectedResponseCodeException($this->objConnector->getLastResponseCode());
+        }
+        return $strResponse;
+    }
+
+    /**
      * Gets the personal leaderboard for a segment
      *
      * @param string $segmentUuid
